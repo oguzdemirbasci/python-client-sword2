@@ -639,19 +639,19 @@ Loading in a locally held Service Document:
             location = resp.get('location', None)
             # Check response headers for updated Locatio
             return Deposit_Receipt(response_headers = dict(resp), location=location, code=204)
-        elif resp['status'] == 200:
+        elif resp['status'] == 200 or resp['status'] == 202:
             #   Deposit receipt in content
-            conn_l.info("Received a valid (200) OK response.")
+            conn_l.info("Received a valid ({}) OK response.".format(resp['status']))
             content_type = resp.get('content-type')
             location = resp.get('location', None)
             # content type header may also includ charset
-            if self._normalise_mime(content_type).startswith("application/atom+xml;type=entry") and len(content) > 0: 
+            if self._normalise_mime(content_type).startswith("application/atom+xml") and len(content):
                 d = Deposit_Receipt(content)
                 if d.parsed:
                     conn_l.info("Server response included a Deposit Receipt. Caching a copy in .resources['%s']" % d.edit)
                     d.response_headers = dict(resp)
                     d.location = location
-                    d.code = 200
+                    d.code = resp['status']
                     self._cache_deposit_receipt(d)
                     return d
             else:
@@ -661,7 +661,7 @@ Loading in a locally held Service Document:
                 d.response_headers = dict(resp)
                 d.location = location
                 d.content = content
-                d.code = 200
+                d.code = resp['status']
                 return d
         else:
             return self._handle_error_response(resp, content)
