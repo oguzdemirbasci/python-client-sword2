@@ -9,23 +9,22 @@ See http://sword-app.svn.sourceforge.net/viewvc/sword-app/spec/trunk/SWORDProfil
 about the SWORD2 AtomPub profile.
  
 """
-from sword2_logging import logging
+from sword2.sword2_logging import logging
 conn_l = logging.getLogger(__name__)
 
-from utils import Timer, NS, get_md5, create_multipart_related
+from sword2.utils import Timer, NS, get_md5, create_multipart_related
 
-from transaction_history import Transaction_History
-from service_document import ServiceDocument
-from deposit_receipt import Deposit_Receipt
-from error_document import Error_Document
-from statement import Atom_Sword_Statement, Ore_Sword_Statement
-from exceptions import *
+from sword2.transaction_history import Transaction_History
+from sword2.service_document import ServiceDocument
+from sword2.deposit_receipt import Deposit_Receipt
+from sword2.error_document import Error_Document
+from sword2.statement import Atom_Sword_Statement, Ore_Sword_Statement
+from sword2.exceptions import *
 
-from compatible_libs import etree
+from sword2.compatible_libs import etree
 
-# import httplib2
-import http_layer
-import urllib
+from sword2 import http_layer
+import urllib.request, urllib.parse, urllib.error
 
 class Connection(object):
     """
@@ -300,7 +299,7 @@ Loading in a locally held Service Document:
             conn_l.error("You are unauthorised (401) to access this document on the server. Check your username/password credentials and your 'On Behalf Of'")
             return self._return_error_or_exception(NotAuthorised, resp, content)
         elif resp['status'] == 403:
-            conn_l.error("You are Forbidden (401) to POST to '%s'. Check your username/password credentials and your 'On Behalf Of'")
+            conn_l.error("You are Forbidden (403) to POST to '%s'. Check your username/password credentials and your 'On Behalf Of'")
             return self._return_error_or_exception(Forbidden, resp, content)
         elif resp['status'] == 406:
             conn_l.error("Cannot negotiate for desired format/packaging on '%s'.")
@@ -592,7 +591,7 @@ Loading in a locally held Service Document:
             headers['Content-Type'] = str(mimetype)
             headers['Content-MD5'] = str(md5sum)
             headers['Content-Length'] = str(f_size)
-            headers['Content-Disposition'] = "attachment; filename=%s" % urllib.quote(filename)
+            headers['Content-Disposition'] = "attachment; filename=%s" % urllib.parse.quote(filename)
             if packaging is not None:
                 headers['Packaging'] = str(packaging)
             

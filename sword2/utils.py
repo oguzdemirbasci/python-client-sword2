@@ -5,7 +5,7 @@
 Utility methods used within the module
 """
 
-from sword2_logging import logging
+from sword2.sword2_logging import logging
 utils_l = logging.getLogger(__name__)
 
 from time import time
@@ -13,11 +13,7 @@ from datetime import datetime
 
 from base64 import b64encode
 
-try:
-    from hashlib import md5
-except ImportError:
-    import md5
-
+from hashlib import md5
 import mimetypes
 
 NS = {}
@@ -55,17 +51,18 @@ def get_md5(data):
     """
     if hasattr(data, "read") and hasattr(data, 'seek'):
         m = md5()
-        chunk = data.read(1024*1024)   # 1Mb
         f_size = 0
-        while(chunk):
-            f_size += len(chunk)
+        for chunk in iter(lambda: data.read(1024*1024), b""):
             m.update(chunk)
-            chunk = data.read(1024*1024)
+            f_size += len(chunk)
+
         data.seek(0)
         return m.hexdigest(), f_size
     else:       # normal str
         m = md5()
         f_size = len(data)
+        if type(data) is not bytes:
+            data = data.encode('utf-8')
         m.update(data)
         return m.hexdigest(), f_size
         
@@ -158,7 +155,7 @@ class Timer(object):
         for name in args:
             if name in self.counts:
                 duration = st_time - self.counts[name]
-                if not self.duration.has_key(name):
+                if name not in self.duration:
                     self.duration[name] = []
                 self.duration[name].append(duration)
                 r.append((len(self.duration[name]) - 1, duration))
@@ -188,25 +185,30 @@ def create_multipart_related(payloads):
     """
     # Generate random boundary code
     # TODO check that it does not occur in the payload data
-    bhash = md5(datetime.now().isoformat()).hexdigest()    # eg 'd8bb3ea6f4e0a4b4682be0cfb4e0a24e'
+    bhash = md5(datetime.now().isoformat().encode('utf-8')).hexdigest()    # eg 'd8bb3ea6f4e0a4b4682be0cfb4e0a24e'
     BOUNDARY = '===========%s_$' % bhash
     CRLF = '\r\n'   # As some servers might barf without this.
     body = []
     for payload in payloads:   # predicatable ordering...
         body.append('--' + BOUNDARY)
         if payload.get('type', None):
-            body.append('Content-Type: %(type)s' % payload)
+            toappend = 'Content-Type: %(type)s' % payload
+            body.append(toappend)
         else:
-            body.append('Content-Type: %s' % get_content_type(payload.get("filename")))
+            toappend = 'Content-Type: %s' % get_content_type(payload.get("filename"))
+            body.append(toappend)
             
         if payload.get('filename', None):
-            body.append('Content-Disposition: attachment; name="%(key)s"; filename="%(filename)s"' % (payload))
+            toappend = 'Content-Disposition: attachment; name="%(key)s"; filename="%(filename)s"' % (payload)
+            body.append(toappend)
         else:
-            body.append('Content-Disposition: attachment; name="%(key)s"' % (payload))
+            toappend = 'Content-Disposition: attachment; name="%(key)s"' % (payload)
+            body.append(toappend)
         
-        if payload.has_key("headers"):
-            for f,v in payload['headers'].iteritems():
-                body.append("%s: %s" % (f, v))     # TODO force ASCII?
+        if "headers" in payload:
+            for f,v in payload['headers'].items():
+                toappend = "%s: %s" % (f, v)
+                body.append(toappend)     # TODO force ASCII?
         
         body.append('MIME-Version: 1.0')
         if payload['key'] == 'payload':
@@ -224,6 +226,6 @@ def create_multipart_related(payloads):
                 body.append(b64encode(payload['data']))
     body.append('--' + BOUNDARY + '--')
     body.append('')
-    body_bytes = CRLF.join(body)
+    body_bytes = CRLF.join(body).encode('utf-8')
     content_type = 'multipart/related; boundary="%s"' % BOUNDARY
     return content_type, body_bytes

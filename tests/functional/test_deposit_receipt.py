@@ -3,7 +3,7 @@ from . import TestController
 from sword2.deposit_receipt import Deposit_Receipt
 from sword2.utils import NS
 
-DR = """<?xml version="1.0" ?>
+DR = b"""<?xml version="1.0" ?>
 <entry xmlns:dcterms="http://purl.org/dc/terms/"
     xmlns:sword="http://purl.org/net/sword/terms/"
     xmlns="http://www.w3.org/2005/Atom"

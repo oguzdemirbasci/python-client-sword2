@@ -9,12 +9,12 @@ document which can be used directly as the metadata entry.
 Also provides Category, which is a convenience function to simplify reading in category information from an atom:entry
 """
 
-from sword2_logging import logging
-from implementation_info import __version__
+from sword2.sword2_logging import logging
+from sword2.implementation_info import __version__
 coll_l = logging.getLogger(__name__)
 
-from compatible_libs import etree
-from utils import NS, get_text
+from sword2.compatible_libs import etree
+from sword2.utils import NS, get_text
 
 from datetime import datetime
 
@@ -219,7 +219,7 @@ class Entry(object):
                 e = etree.SubElement(self.entry, NS[nmsp] % tag, nsmap=self.nsmap) # Notice we explicitly declare the nsmap
                 e.text = v
                 if attrs is not None:
-                    for an, av in attrs.iteritems():
+                    for an, av in attrs.items():
                         e.set(an, av)
         elif k == "author" and isinstance(v, dict):
             self.add_author(**v)
@@ -232,7 +232,7 @@ class Entry(object):
         >>> e.add_fields(dcterms_title="Origin of the Species",
                         dcterms_contributor="Darwin, Charles")
         """
-        for k,v in kw.iteritems():
+        for k,v in kw.items():
             self.add_field(k,v)
 
     def add_author(self, name, uri=None, email=None):
@@ -264,6 +264,9 @@ class Entry(object):
     def __str__(self):
         """Export the XML to a bytestring, ready for use"""
         xml_str = etree.tostring(self.entry)
+        if type(xml_str) is bytes:
+            xml_str = str(xml_str, 'utf-8')
+
         if not xml_str.startswith('<?xml version="1.0"?>'):
             xml_str = '<?xml version="1.0"?>' + xml_str
         return xml_str

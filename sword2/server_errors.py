@@ -4,7 +4,7 @@
 Dictionary of SWORD2-specific IRI errors to simple description and expected accompanying HTTP codes.
 """
 
-from sword2_logging import logging
+from sword2.sword2_logging import logging
 sworderror_l = logging.getLogger(__name__)
 
 SWORD2ERRORSBYNAME = {}
@@ -52,7 +52,7 @@ SWORD2ERRORSBYNAME["UNKNOWNERROR"] = { "name":"UNKNOWNERROR",
                                        "description":"Error IRI is not within the SWORD2 specification and so, is not enumerated by this constant",
                                        "codes":[] }
 
-for k,v in SWORD2ERRORSBYNAME.iteritems():
+for k,v in SWORD2ERRORSBYNAME.items():
     SWORD2ERRORSBYIRI[v['IRI']] = v
 
 def get_error(iri, code=None):

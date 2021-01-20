@@ -4,10 +4,10 @@
 Provides a convenience class for handling and parsing Error Document responses.
 """
 
-from deposit_receipt import Deposit_Receipt
-from server_errors import SWORD2ERRORSBYIRI, get_error
+from sword2.deposit_receipt import Deposit_Receipt
+from sword2.server_errors import SWORD2ERRORSBYIRI, get_error
 
-from sword2_logging import logging
+from sword2.sword2_logging import logging
 ed_l = logging.getLogger(__name__)
 
 class Error_Document(Deposit_Receipt):

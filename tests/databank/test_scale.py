@@ -4,13 +4,13 @@ from sword2 import Connection, Entry, UrlLib2Layer
 
 PACKAGE = "/home/richard/Desktop/massive_file.zip"
 PACKAGE_MIME = "application/zip"
-SSS_URL = "http://localhost:5000/swordv2/service-document"
-SSS_UN = "admin"
-SSS_PW = "admin"
+SSS_URL = "http://localhost:8081/sd-uri"
+SSS_UN = "sword"
+SSS_PW = "sword"
 SSS_OBO = "obo"
 
 class TestScale(TestController):
-    
+    """
     def test_01_massive_file(self):
         http = UrlLib2Layer()
         conn = Connection(SSS_URL, user_name=SSS_UN, user_pass=SSS_PW, http_impl=http)
@@ -29,3 +29,4 @@ class TestScale(TestController):
                             packaging='http://purl.org/net/sword/package/Binary')
                             
         assert new_receipt.code == 204
+    """

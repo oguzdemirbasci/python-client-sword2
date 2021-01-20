@@ -3,7 +3,7 @@ from . import TestController
 from sword2.error_document import Error_Document
 from sword2.utils import NS
 
-ED = """<?xml version="1.0" encoding="utf-8"?>
+ED = b"""<?xml version="1.0" encoding="utf-8"?>
 <sword:error xmlns="http://www.w3.org/2005/Atom"
        xmlns:sword="http://purl.org/net/sword/terms/"
        xmlns:arxiv="http://arxiv.org/schemas/atom"
@@ -28,7 +28,7 @@ ED = """<?xml version="1.0" encoding="utf-8"?>
 </sword:error>
 """
 
-ED2 = """<?xml version="1.0" encoding="utf-8"?>
+ED2 = b"""<?xml version="1.0" encoding="utf-8"?>
 <sword:error xmlns="http://www.w3.org/2005/Atom"
        xmlns:sword="http://purl.org/net/sword/terms/"
        xmlns:arxiv="http://arxiv.org/schemas/atom"
@@ -65,7 +65,7 @@ class TestEntry(TestController):
         assert error_d.title == "ERROR"
         assert error_d.summary == """The manifest could be parsed, but was not valid - 
     no technical metadata was provided."""
-        print error_d.metadata
+        print(error_d.metadata)
         assert error_d.verbose_description[0].strip() == """Exception at [ ... ]""", error_d.verbose_description
         
     def test_02_error_info(self):
