@@ -60,10 +60,10 @@ def get_md5(data):
         return m.hexdigest(), f_size
     else:       # normal str
         m = md5()
-        f_size = len(data)
         if type(data) is not bytes:
             data = data.encode('utf-8')
         m.update(data)
+        f_size = len(data)
         return m.hexdigest(), f_size
         
 
